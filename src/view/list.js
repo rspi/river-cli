@@ -1,5 +1,6 @@
 import blessed from 'blessed';
 import _ from 'ramda';
+import * as ctrl from '../ctrl/list';
 
 let list;
 let namemap = [];
@@ -41,7 +42,7 @@ let createList = (emitter, s) => {
     screen = s;
   }
   applyListeners(emitter);
-  applyDispatchers(emitter);
+  handleUserInput();
   return list;
 };
 
@@ -51,17 +52,18 @@ let applyListeners = (emitter) => {
   emitter.on('LIST_TRACKS', setTrackList);
 };
 
-let applyDispatchers = (emitter) => {
+let handleUserInput = () => {
   list.on('select', (_, index) => {
-    // check if the item is a playable.
-    selectionHistory.push(index);
-    lastIndex = 0;
-    emitter.emit('OPEN', namemap[index]);
+    if (ctrl.getActiveType() !== 'TRACKS') {
+      selectionHistory.push(index);
+      lastIndex = 0;
+    }
+    ctrl.open(namemap[index]);
   });
   list.on('keypress', (_, key) => {
     if (key.name === 'backspace' || key.name === 'h') {
       lastIndex = selectionHistory.pop() || 0;
-      emitter.emit('BACK');
+      ctrl.back();
     }
   });
 };

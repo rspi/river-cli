@@ -5,49 +5,49 @@ import json from '../../sampledata.json';
 
 let history = [];
 let currentType = 'ARTISTS';
+let dispatcher;
 
 let init = (emitter, screen) => {
+  dispatcher = emitter;
   let view = createList(emitter, screen);
-  emitter.emit('LIST_ARTISTS', _.keys(json));
-  listen(emitter);
+  dispatcher.emit('LIST_ARTISTS', _.keys(json));
   return view;
 };
 
+let getActiveType = () => currentType;
 
-let listen = emitter => {
-  emitter.on('OPEN', data => {
-
-    switch (currentType) {
-      case 'ARTISTS':
-        history.push(data);
-        emitter.emit('LIST_ALBUMS', json[data].Albums);
-        currentType = 'ALBUMS';
-        break;
-      case 'ALBUMS':
-        history.push(data);
-        emitter.emit('LIST_TRACKS', json[history[0]].Albums[data].Tracks);
-        currentType = 'TRACKS';
-        break;
-      case 'TRACKS':
-        let path = json[history[0]].Albums[history[1]].Path;
-        play(path, data);
-        break;
-    }
-  });
-  emitter.on('BACK', () => {
-    switch (currentType) {
-      case 'ALBUMS':
-        history = [];
-        emitter.emit('LIST_ARTISTS', _.keys(json));
-        currentType = 'ARTISTS';
-        break;
-      case 'TRACKS':
-        history.pop();
-        emitter.emit('LIST_ALBUMS', json[history[0]].Albums);
-        currentType = 'ALBUMS';
-        break;
-    }
-  });
+let open = name => {
+  switch (currentType) {
+    case 'ARTISTS':
+      history.push(name);
+      dispatcher.emit('LIST_ALBUMS', json[name].Albums);
+      currentType = 'ALBUMS';
+      break;
+    case 'ALBUMS':
+      history.push(name);
+      dispatcher.emit('LIST_TRACKS', json[history[0]].Albums[name].Tracks);
+      currentType = 'TRACKS';
+      break;
+    case 'TRACKS':
+      let path = json[history[0]].Albums[history[1]].Path;
+      play(path, name);
+      break;
+  }
 };
 
-export {init};
+let back = () => {
+  switch (currentType) {
+    case 'ALBUMS':
+      history = [];
+      dispatcher.emit('LIST_ARTISTS', _.keys(json));
+      currentType = 'ARTISTS';
+      break;
+    case 'TRACKS':
+      history.pop();
+      dispatcher.emit('LIST_ALBUMS', json[history[0]].Albums);
+      currentType = 'ALBUMS';
+      break;
+  }
+};
+
+export {init, open, back, getActiveType};
