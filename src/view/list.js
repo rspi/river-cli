@@ -4,6 +4,8 @@ import _ from 'ramda';
 let list;
 let namemap = [];
 let screen;
+let selectionHistory = [];
+let lastIndex = 0;
 
 let options = {
   top: 0,
@@ -51,10 +53,14 @@ let applyListeners = (emitter) => {
 
 let applyDispatchers = (emitter) => {
   list.on('select', (_, index) => {
+    // check if the item is a playable.
+    selectionHistory.push(index);
+    lastIndex = 0;
     emitter.emit('OPEN', namemap[index]);
   });
   list.on('keypress', (_, key) => {
     if (key.name === 'backspace' || key.name === 'h') {
+      lastIndex = selectionHistory.pop() || 0;
       emitter.emit('BACK');
     }
   });
@@ -64,6 +70,7 @@ let setArtistList = (artists) => {
   namemap = artists;
   let toString = artistname => ' ' + artistname;
   list.setItems(artists.map(toString));
+  list.select(lastIndex);
   screen.render();
 };
 
@@ -76,6 +83,7 @@ let setTrackList = (tracks) => {
   tracks = sortByNumber(_.values(tracks));
   namemap = tracks.map(track => track.Number);
   list.setItems(tracks.map(toString));
+  list.select(lastIndex);
   screen.render();
 };
 
@@ -86,6 +94,7 @@ let setAlbumList = (albums) => {
   albums = sortByYear(_.values(albums));
   namemap = albums.map(album => album.Name);
   list.setItems(albums.map(toString));
+  list.select(lastIndex);
   screen.render();
 };
 
