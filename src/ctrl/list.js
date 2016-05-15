@@ -56,7 +56,6 @@ let open = name => {
     case 'TRACKS':
       let path = json[navPath[0]].Albums[navPath[1]].Path;
       playingPath = navPath.slice();
-      // console.log('c',playingPath)
       play(path, name);
       break;
   }

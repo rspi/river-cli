@@ -1,7 +1,7 @@
 {
   "name": "river",
   "version": "1.0.0",
-  "description": "Terminal music client for streaming.",
+  "description": "personal music streaming CLI.",
   "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
