@@ -70,32 +70,43 @@ let handleUserInput = () => {
 
 let setArtistList = (artists) => {
   namemap = artists;
-  let toString = artistname => ' ' + artistname;
+  let curretlyPlaying = ctrl.getPlaying();
+  let toString = artistname => {
+    let symbol = curretlyPlaying === artistname ? '❯' : ' ';
+    return symbol + artistname;
+  };
   list.setItems(artists.map(toString));
   list.select(lastIndex);
   screen.render();
 };
 
-let setTrackList = (tracks) => {
-  let sortByNumber = _.sortBy(_.prop('Number'));
-  let toString = track => {
-    let tracknumber = track.Number < 10 ? '0' + track.Number : track.Number;
-    return ' ' + tracknumber + ' ' + track.Name + '{|}' + track.Length;
-  };
-  tracks = sortByNumber(_.values(tracks));
-  namemap = tracks.map(track => track.Number);
-  list.setItems(tracks.map(toString));
-  list.select(lastIndex);
-  screen.render();
-};
-
 let setAlbumList = (albums) => {
+  let curretlyPlaying = ctrl.getPlaying();
   let sortByYear = _.sortBy(_.prop('Year'));
-  let toString = album => ' [' + album.Year + '] ' + album.Name;
+
+  let toString = album => {
+    let symbol = curretlyPlaying === album.Name ? '❯' : ' ';
+    return symbol + '[' + album.Year + '] ' + album.Name;
+  };
 
   albums = sortByYear(_.values(albums));
   namemap = albums.map(album => album.Name);
   list.setItems(albums.map(toString));
+  list.select(lastIndex);
+  screen.render();
+};
+
+let setTrackList = (tracks) => {
+  let curretlyPlaying = ctrl.getPlaying();
+  let sortByNumber = _.sortBy(_.prop('Number'));
+  let toString = track => {
+    let tracknumber = track.Number < 10 ? '0' + track.Number : track.Number;
+    let symbol = curretlyPlaying === track.Number ? '❯' : ' ';
+    return symbol + tracknumber + ' ' + track.Name + '{|}' + track.Length;
+  };
+  tracks = sortByNumber(_.values(tracks));
+  namemap = tracks.map(track => track.Number);
+  list.setItems(tracks.map(toString));
   list.select(lastIndex);
   screen.render();
 };
