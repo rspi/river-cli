@@ -16,7 +16,11 @@ let kill = () => {
 let play = (path, position) => {
   kill();
   let host = 'http://localhost:8000/';
-  mpv = spawn('mpv', ['--playlist=' + host + path + 'playlist.m3u', '--playlist-pos=' + (position - 1), '--no-audio-display']);
+  if (!position) {
+    mpv = spawn('mpv', [host + encodeURI(path), '--no-audio-display']);
+  } else {
+    mpv = spawn('mpv', ['--playlist=' + host + path + 'playlist.m3u', '--playlist-pos=' + (position - 1), '--no-audio-display']);
+  }
 
   // mpv.on('close', () => process.exit(0));
   mpv.on('exit', () => {

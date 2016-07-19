@@ -8,6 +8,9 @@ let screen;
 let selectionHistory = [];
 let lastIndex = 0;
 
+let currentlyVisibleFolders = [];
+let currentlyVisibleFiles = [];
+
 let options = {
   top: 0,
   left: 'center',
@@ -50,22 +53,68 @@ let applyListeners = (emitter) => {
   emitter.on('LIST_ARTISTS', setArtistList);
   emitter.on('LIST_ALBUMS', setAlbumList);
   emitter.on('LIST_TRACKS', setTrackList);
+  emitter.on('SELECT_LIST', selectList);
+  emitter.on('LIST_NODES', setNodeList);
+};
+
+let selectList = () => {
+  list.setItems([' Music sorted by tags', ' Music by folder structure']);
+  screen.render();
 };
 
 let handleUserInput = () => {
   list.on('select', (_, index) => {
-    if (ctrl.getActiveType() !== 'TRACKS') {
-      selectionHistory.push(index);
-      lastIndex = 0;
+    switch (ctrl.getActiveType()) {
+      case 'NODE':
+        const noFiles = currentlyVisibleFiles.length === 0;
+        const noFolders = currentlyVisibleFolders.length === 0;
+
+        if (noFiles && noFolders) {
+          break;
+        }
+
+        lastIndex = 0;
+
+        if (noFolders || index >= currentlyVisibleFolders.length) {
+          ctrl.openFileNode(currentlyVisibleFiles[index - currentlyVisibleFolders.length]);
+        } else {
+          selectionHistory.push(index);
+          ctrl.openFolderNode(currentlyVisibleFolders[index]);
+        }
+        break;
+      case 'SELECT_LIST':
+        let listType = index === 0 ? 'SORTED' : 'UNSORTED';
+        ctrl.selectListType(listType);
+        break;
+      case 'ARTISTS':
+      case 'ALBUMS':
+        selectionHistory.push(index);
+        lastIndex = 0;
+      case 'TRACKS':
+        ctrl.open(namemap[index]);
+        break;
     }
-    ctrl.open(namemap[index]);
   });
+
   list.on('keypress', (_, key) => {
     if (key.name === 'backspace' || key.name === 'h') {
       lastIndex = selectionHistory.pop() || 0;
       ctrl.back();
     }
   });
+};
+
+let setNodeList = node => {
+  currentlyVisibleFolders = _.keys(node.Folders);
+  currentlyVisibleFiles = node.Files.map(file => file.Name);
+
+  let toRender = currentlyVisibleFolders
+    .concat(currentlyVisibleFiles)
+    .map(name => ' ' + name);
+
+  list.setItems(toRender);
+  list.select(lastIndex);
+  screen.render();
 };
 
 let setArtistList = (artists) => {
