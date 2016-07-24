@@ -1,29 +1,35 @@
 import {play} from '../model/player';
 import {createList} from '../view/list';
 import _ from 'ramda';
-import json from '../../sampledata.json';
+import {metaDataPromise} from '../model/metadata';
+import {sorted as sortedPath, unsorted as unsortedPath} from '../model/config';
 
 let navPath = [];
 let playingPath = [];
 let currentType = 'SELECT_LIST';
 let dispatcher;
+let json;
 
 let init = (emitter, screen) => {
   dispatcher = emitter;
   let view = createList(emitter, screen);
 
-  dispatcher.emit('SELECT_LIST');
+  metaDataPromise.then(resp => {
+    json = resp;
+    dispatcher.emit('SELECT_LIST');
 
-  dispatcher.on('TRACK_UPDATE', track => {
-    if (_.is(Number, _.last(playingPath))) {
-      playingPath[playingPath.length - 1] = track;
-    } else {
-      playingPath.push(track);
-    }
-    if (currentType === 'TRACKS') {
-      dispatcher.emit('LIST_TRACKS', json.Sorted[navPath[0]].Albums[navPath[1]].Tracks);
-    }
+    dispatcher.on('TRACK_UPDATE', track => {
+      if (_.is(Number, _.last(playingPath))) {
+        playingPath[playingPath.length - 1] = track;
+      } else {
+        playingPath.push(track);
+      }
+      if (currentType === 'TRACKS') {
+        dispatcher.emit('LIST_TRACKS', json.Sorted[navPath[0]].Albums[navPath[1]].Tracks);
+      }
+    });
   });
+
 
   return view;
 };
@@ -61,13 +67,13 @@ let open = name => {
     case 'TRACKS':
       let path = json.Sorted[navPath[0]].Albums[navPath[1]].Path;
       playingPath = navPath.slice();
-      play(path, name);
+      play(sortedPath + '/' + path, name);
       break;
   }
 };
 
 let openFileNode = (name) => {
-  play(navPath.concat([name]).join('/'));
+  play(unsortedPath + '/' + navPath.concat([name]).join('/'));
 };
 
 let openFolderNode = (name) => {

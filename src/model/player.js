@@ -1,4 +1,5 @@
 import {spawn} from 'child_process';
+import {host} from './config';
 
 let emitter;
 let mpv;
@@ -15,7 +16,6 @@ let kill = () => {
 
 let play = (path, position) => {
   kill();
-  let host = 'http://localhost:8000/';
   if (!position) {
     mpv = spawn('mpv', [host + encodeURI(path), '--no-audio-display']);
   } else {
