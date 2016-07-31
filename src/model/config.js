@@ -35,4 +35,14 @@ if (!config.metafile) {
   console.log('[.riverrc] Missing field "metafile"\n Path from host to generated json file (by river_gen).');
   process.exit(1);
 }
+
+if (!config.username) {
+  console.log('[.riverrc] Missing field "username"\n Basic auth username');
+  process.exit(1);
+}
+
+if (!config.metafile) {
+  console.log('[.riverrc] Missing field "metafile"\n Path from host to generated json file (by river_gen).');
+  process.exit(1);
+}
 export default config;

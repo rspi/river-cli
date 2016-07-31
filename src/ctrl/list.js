@@ -28,8 +28,11 @@ let init = (emitter, screen) => {
         dispatcher.emit('LIST_TRACKS', json.Sorted[navPath[0]].Albums[navPath[1]].Tracks);
       }
     });
+  }).catch(err => {
+    if (err.code === 401) {
+      dispatcher.emit('UNAUTHORIZED');
+    }
   });
-
 
   return view;
 };
