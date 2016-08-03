@@ -32,6 +32,9 @@ let init = (emitter, screen) => {
     if (err.code === 401) {
       dispatcher.emit('UNAUTHORIZED');
     }
+    if (err.errno === 'ECONNREFUSED') {
+      dispatcher.emit('METADATA_FETCH_ERROR');
+    }
   });
 
   return view;
