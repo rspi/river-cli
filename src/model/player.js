@@ -1,11 +1,21 @@
 import {spawn} from 'child_process';
-import {host} from './config';
+import {host, username, password} from './config';
 
 let emitter;
 let mpv;
 
 let init = (e) => {
   emitter = e;
+
+  let basicAuth = username + ':' + password + '@';
+
+  if (username && password) {
+    if (host.indexOf('http') !== -1) {
+      host = host.replace(/:\/\//g, '://' + basicAuth);
+    } else {
+      host = basicAuth + host;
+    }
+  }
 };
 
 let kill = () => {
@@ -21,11 +31,6 @@ let play = (path, position) => {
   } else {
     mpv = spawn('mpv', ['--playlist=' + host + path + 'playlist.m3u', '--playlist-pos=' + (position - 1), '--no-audio-display']);
   }
-
-  // mpv.on('close', () => process.exit(0));
-  mpv.on('exit', () => {
-  });
-
   mpv.stderr.on('data', data => {
     let string = data.toString();
     let str = string.match(new RegExp(/(\d\d\:\d\d:\d\d)|\(([^\)]+)%\)/g));
