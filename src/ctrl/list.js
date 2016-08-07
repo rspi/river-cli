@@ -54,6 +54,7 @@ let getPlaying = () => {
         return playingPath[2];
       }
   }
+  return -1;
 };
 
 let open = name => {
@@ -79,6 +80,7 @@ let open = name => {
 };
 
 let openFileNode = (name) => {
+  playingPath = [];
   play(unsortedPath + '/' + navPath.concat([name]).join('/'));
 };
 
