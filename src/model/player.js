@@ -1,21 +1,10 @@
 import {spawn} from 'child_process';
-import {host, username, password} from './config';
 
 let emitter;
 let mpv;
 
 let init = (e) => {
   emitter = e;
-
-  let basicAuth = username + ':' + password + '@';
-
-  if (username && password) {
-    if (host.indexOf('http') !== -1) {
-      host = host.replace(/:\/\//g, '://' + basicAuth);
-    } else {
-      host = basicAuth + host;
-    }
-  }
 };
 
 let kill = () => {
@@ -24,13 +13,10 @@ let kill = () => {
   }
 };
 
-let play = (path, position) => {
+let play = (playlist, position) => {
   kill();
-  if (!position) {
-    mpv = spawn('mpv', [host + encodeURI(path), '--no-audio-display']);
-  } else {
-    mpv = spawn('mpv', ['--playlist=' + host + path + 'playlist.m3u', '--playlist-pos=' + (position - 1), '--no-audio-display']);
-  }
+  mpv = spawn('mpv', [...playlist, '--no-audio-display', '--playlist-pos=' + (position - 1)]);
+
   mpv.stderr.on('data', data => {
     let string = data.toString();
     let str = string.match(new RegExp(/(\d\d\:\d\d:\d\d)|\(([^\)]+)%\)/g));

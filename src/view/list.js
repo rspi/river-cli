@@ -76,7 +76,7 @@ let handleUserInput = () => {
         lastIndex = 0;
 
         if (noFolders || index >= currentlyVisibleFolders.length) {
-          ctrl.openFileNode(currentlyVisibleFiles[index - currentlyVisibleFolders.length]);
+          ctrl.openFileNode(index);
         } else {
           selectionHistory.push(index);
           ctrl.openFolderNode(currentlyVisibleFolders[index]);

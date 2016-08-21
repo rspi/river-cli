@@ -41,6 +41,11 @@ if (!config.username) {
   process.exit(1);
 }
 
+if (!config.password) {
+  console.log('[.riverrc] Missing field "password"\n Basic auth password');
+  process.exit(1);
+}
+
 if (!config.metafile) {
   console.log('[.riverrc] Missing field "metafile"\n Path from host to generated json file (by river_gen).');
   process.exit(1);

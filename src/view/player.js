@@ -51,7 +51,7 @@ let createPlayer = (emitter, s) => {
     let icon = paused ? '►' : '◼';
     current = current.replace(/^00:/, '');
     total = total.replace(/^00:/, '');
-    percentage = percentage === 99 ? 100 : percentage;
+    percentage = percentage > 97 ? 100 : percentage;
 
 
     playPauseStatus.setContent(icon);
