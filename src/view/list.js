@@ -59,6 +59,7 @@ let applyListeners = (emitter) => {
 
 let selectList = () => {
   list.setItems([' Music sorted by tags', ' Music by folder structure']);
+  list.select(lastIndex);
   screen.render();
 };
 
@@ -84,6 +85,7 @@ let handleUserInput = () => {
         break;
       case 'SELECT_LIST':
         let listType = index === 0 ? 'SORTED' : 'UNSORTED';
+        selectionHistory.push(index);
         ctrl.selectListType(listType);
         break;
       case 'ARTISTS':
